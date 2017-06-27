@@ -74,9 +74,9 @@ try
     [System.IO.Compression.ZipFile]::ExtractToDirectory("$oselDir\$oselRes", $oselDir)
 
 #exec init-server    
-    LogToFile "starting OSEL init-server.ps1" 
+    LogToFile "starting OSEL => .\init-server.ps1 -step new-server" 
     Set-Location "$oselDir\StandAloneScripts\ServerSetup\"
-    & .\init-server.ps1 -step new-server
+    .\init-server.ps1 -step new-server
 
 #done    
     LogToFile "OSEL init-server finished" 
