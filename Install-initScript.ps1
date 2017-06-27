@@ -27,7 +27,7 @@ param
 function LogToFile( [string] $text )
 {
     $date = Get-Date -Format s
-    "$date: $text" | Out-File $logFile -Append
+    "$($date): $text" | Out-File $logFile -Append
 }
 
 
@@ -71,7 +71,7 @@ try
 
 #unzip
     LogToFile "unziping OSEL to [$oselDir]"   
-    [System.IO.Compression.ZipFile]::ExtractToDirectory "$oselDir\$oselRes" $oselDir
+    [System.IO.Compression.ZipFile]::ExtractToDirectory("$oselDir\$oselRes", $oselDir)
 
 #exec init-server    
     LogToFile "starting OSEL init-server.ps1" 
