@@ -76,7 +76,7 @@ try
 #exec init-server    
     LogToFile "starting OSEL => .\init-server.ps1 -step new-server" 
     Set-Location "$oselDir\StandAloneScripts\ServerSetup\"
-    .\init-server.ps1 -step new-server
+    .\init-server.ps1 -step new-server >> $logFile
 
 #done    
     LogToFile "OSEL init-server finished" 
