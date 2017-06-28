@@ -38,8 +38,8 @@ function LogToFile( [string] $text )
 try
 {
 #enable samba    
-    LogToFile "Enabling Samba" 
-    netsh advfirewall firewall set rule group="File and Printer Sharing" new enable=Yes
+    # LogToFile "Enabling Samba" 
+    # netsh advfirewall firewall set rule group="File and Printer Sharing" new enable=Yes
 
     $sasDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($SAS))
     $serverEnv = $serverEnv.Replace("_", " ")
