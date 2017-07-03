@@ -5,7 +5,9 @@ param
     [Parameter(Mandatory=$true)] [string]$octopusEnv,
     [Parameter(Mandatory=$true)] [string]$serverRegion,
     [Parameter(Mandatory=$true)] [string]$serverRole,
-	[Parameter(Mandatory=$true)] [string]$SAS
+	[Parameter(Mandatory=$true)] [string]$SAS,
+    [Parameter(Mandatory=$true)] [string]$redisCache,
+    [Parameter(Mandatory=$true)] [string]$serviceBus
 )
 
 #region CONSTANTS
@@ -41,6 +43,8 @@ try
     # LogToFile "Enabling Samba" 
     # netsh advfirewall firewall set rule group="File and Printer Sharing" new enable=Yes
 
+    $redisDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($redisCache))
+    $svcbusDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($serviceBus))
     $sasDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($SAS))
     $serverEnv = $serverEnv.Replace("_", " ")
     $octopusEnv = $octopusEnv.Replace("_", " ")
@@ -52,6 +56,8 @@ try
     LogToFile "Server region: $serverRegion" 
     LogToFile "Server role: $serverRole" 
     LogToFile "SAS token: $sasDecoded" 
+    LogToFile "Redis Cache connection string: $redisDecoded" 
+    LogToFile "Service Bus connection string: $svcbusDecoded" 
 
 #persist parameters in the Osel Dir
     if (!(test-path $oselDir)) {mkdir $oselDir }
@@ -60,9 +66,12 @@ try
        octopusEnv=$octopusEnv;
        region=$serverRegion;
        role=$serverRole;
-       SAS=$SAS } | 
-                ConvertTo-Json | 
-                Out-File "$oselDir\$cfgJson"
+       SAS=$SAS;
+       RedisCache=$redisDecoded;
+       ServiceBus=$svcbusDecoded     
+        } | 
+        ConvertTo-Json | 
+        Out-File "$oselDir\$cfgJson"
 
 #download resource storage
     $url = "$rootStgContainer/$serverEnv/$oselRes"
