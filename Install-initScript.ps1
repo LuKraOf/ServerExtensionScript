@@ -32,6 +32,49 @@ function LogToFile( [string] $text )
     "$($date): $text" | Out-File $logFile -Append
 }
 
+function InstallFeatures()
+{
+	LogToFile "Prerequisite: IIS-ASPNET45";
+	dism /online /enable-feature /all /featurename:IIS-ASPNET45 /NoRestart
+
+	LogToFile "Prerequisite: NetFx4ServerFeatures";
+	dism /online /get-featureinfo /featurename:NetFx4ServerFeatures
+	LogToFile "Prerequisite: NetFx3ServerFeatures";
+	dism /online /enable-feature /featurename:NetFx3ServerFeatures
+	LogToFile "Prerequisite: NetFx3";
+	dism /online /enable-feature /featurename:NetFx3
+
+	$features = @(	"Web-ASP",
+					"Web-CGI",
+					"Web-ISAPI-Ext",
+					"Web-ISAPI-Filter",
+					"Web-Includes",
+					"Web-HTTP-Errors",
+					"Web-Common-HTTP",
+					"Web-Performance",
+					"Web-Basic-Auth",
+					"Web-Http-Tracing",
+					"Web-Stat-Compression",
+					"Web-Http-Logging",
+					"WAS",
+					"Web-Dyn-Compression",
+					"Web-Client-Auth",
+					"Web-IP-Security",
+					"Web-Url-Auth",
+					"Web-Http-Redirect",
+					"Web-Request-Monitor",
+					"Web-Net-Ext45",
+					"Web-Asp-Net45"
+				)
+
+	foreach( $f in $features )
+	{
+		LogToFile "Web Feature: $f ... ";
+		 Get-WindowsFeature -Name $f | Where-Object InstallState -ne Installed | Install-WindowsFeature		
+	}
+}
+
+
 
 #start
     LogToFile "Current folder $currentScriptFolder" 
@@ -58,6 +101,9 @@ try
     LogToFile "SAS token: $sasDecoded" 
     LogToFile "Redis Cache connection string: $redisDecoded" 
     LogToFile "Service Bus connection string: $svcbusDecoded" 
+
+#deploy mandatory features
+    InstallFeatures
 
 #persist parameters in the Osel Dir
     if (!(test-path $oselDir)) {mkdir $oselDir }
