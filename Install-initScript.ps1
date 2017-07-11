@@ -1,13 +1,14 @@
 [CmdletBinding()]
 param
 (
-	[Parameter(Mandatory=$true)] [string]$serverEnv,
+    [Parameter(Mandatory=$true)] [string]$serverEnv,
     [Parameter(Mandatory=$true)] [string]$octopusEnv,
     [Parameter(Mandatory=$true)] [string]$serverRegion,
     [Parameter(Mandatory=$true)] [string]$serverRole,
-	[Parameter(Mandatory=$true)] [string]$SAS,
+    [Parameter(Mandatory=$true)] [string]$SAS,
     [Parameter(Mandatory=$true)] [string]$redisCache,
-    [Parameter(Mandatory=$true)] [string]$serviceBus
+#    [Parameter(Mandatory=$true)] [string]$serviceBus,
+    [Parameter(Mandatory=$true)] [string]$blobStorage
 )
 
 #region CONSTANTS
@@ -87,7 +88,8 @@ try
     # netsh advfirewall firewall set rule group="File and Printer Sharing" new enable=Yes
 
     $redisDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($redisCache))
-    $svcbusDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($serviceBus))
+#    $svcbusDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($serviceBus))
+    $blobstgDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($blobStorage))
     $sasDecoded = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($SAS))
     $serverEnv = $serverEnv.Replace("_", " ")
     $octopusEnv = $octopusEnv.Replace("_", " ")
@@ -100,10 +102,11 @@ try
     LogToFile "Server role: $serverRole" 
     LogToFile "SAS token: $sasDecoded" 
     LogToFile "Redis Cache connection string: $redisDecoded" 
-    LogToFile "Service Bus connection string: $svcbusDecoded" 
+#    LogToFile "Service Bus connection string: $svcbusDecoded" 
+    LogToFile "BLOB Storage connection string: $blobstgDecoded" 
 
 #deploy mandatory features
-    InstallFeatures
+    #InstallFeatures
 
 #persist parameters in the Osel Dir
     if (!(test-path $oselDir)) {mkdir $oselDir }
@@ -114,7 +117,8 @@ try
        role=$serverRole;
        SAS=$SAS;
        RedisCache=$redisDecoded;
-       ServiceBus=$svcbusDecoded     
+#       ServiceBus=$svcbusDecoded;
+       BLOBStorage=$blobstgDecoded     
         } | 
         ConvertTo-Json | 
         Out-File "$oselDir\$cfgJson"
